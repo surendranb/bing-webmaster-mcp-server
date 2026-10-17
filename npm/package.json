@@ -1,0 +1,39 @@
+{
+  "name": "bing-webmaster-tools-mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol (MCP) server for Bing Webmaster Tools & IndexNow API via NPX. Spawns the Python package through uvx with full stdio passthrough.",
+  "main": "bin/index.js",
+  "bin": {
+    "bing-webmaster-tools-mcp": "bin/index.js",
+    "bing-webmaster-mcp": "bin/index.js"
+  },
+  "scripts": {
+    "test": "node bin/index.js --help"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "bing-webmaster",
+    "bing",
+    "indexnow",
+    "seo",
+    "search-analytics",
+    "ai-agent",
+    "anthropic",
+    "claude",
+    "cursor"
+  ],
+  "author": "Surendran B <reachsuren@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/surendranb/bing-webmaster-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/surendranb/bing-webmaster-mcp-server/issues"
+  },
+  "homepage": "https://bing-webmaster.builditwithai.xyz",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
