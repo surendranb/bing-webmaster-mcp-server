@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bing-webmaster-mcp"
+version = "0.1.1"
+description = "Bing Webmaster Tools & IndexNow API MCP server for AI agents: search performance, crawl issues, and instant URL indexing."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Surendran B", email = "reachsuren@gmail.com" }]
+keywords = ["mcp", "mcp-server", "bing", "bing-webmaster", "indexnow", "seo", "search-analytics", "agents"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcp>=2.0.0,<3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.urls]
+Homepage = "https://bing-webmaster.builditwithai.xyz"
+Repository = "https://github.com/surendranb/bing-webmaster-mcp-server.git"
+Issues = "https://github.com/surendranb/bing-webmaster-mcp-server/issues"
+
+[project.scripts]
+bing-webmaster-mcp = "bing_webmaster_mcp.server:main"
+bing-webmaster-tools-mcp = "bing_webmaster_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+bing_webmaster_mcp = ["skills/*.md"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
