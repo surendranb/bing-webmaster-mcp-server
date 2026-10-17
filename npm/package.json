@@ -1,6 +1,6 @@
 {
   "name": "bing-webmaster-tools-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Model Context Protocol (MCP) server for Bing Webmaster Tools & IndexNow API via NPX. Spawns the Python package through uvx with full stdio passthrough.",
   "main": "bin/index.js",
   "bin": {
