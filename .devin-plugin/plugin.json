@@ -1,0 +1,21 @@
+{
+  "name": "bing-webmaster-mcp",
+  "version": "0.1.3",
+  "description": "Bing Webmaster Tools and IndexNow API MCP server for AI agents: search performance, crawl issues, and instant URL indexing",
+  "author": {
+    "name": "Surendran B",
+    "url": "https://github.com/surendranb"
+  },
+  "mcpServers": {
+    "bing-webmaster-mcp": {
+      "command": "uvx",
+      "args": [
+        "bing-webmaster-mcp==0.1.3"
+      ],
+      "env": {
+        "BING_WEBMASTER_API_KEY": "${BING_WEBMASTER_API_KEY}",
+        "INDEXNOW_KEY": "${INDEXNOW_KEY}"
+      }
+    }
+  }
+}

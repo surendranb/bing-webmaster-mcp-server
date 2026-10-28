@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.surendranb/bing-webmaster-mcp",
+  "title": "Bing Webmaster & IndexNow MCP",
+  "description": "Bing Webmaster Tools and IndexNow API MCP server for AI agents: search performance, crawl issues, and instant URL indexing.",
+  "repository": {
+    "url": "https://github.com/surendranb/bing-webmaster-mcp-server",
+    "source": "github"
+  },
+  "version": "0.1.3",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "bing-webmaster-mcp",
+      "version": "0.1.3",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BING_WEBMASTER_API_KEY",
+          "description": "Bing Webmaster Tools API Key",
+          "required": false
+        },
+        {
+          "name": "INDEXNOW_KEY",
+          "description": "IndexNow key for instant search engine indexing",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
