@@ -1,0 +1,21 @@
+id: bing-webmaster-mcp
+name: Bing Webmaster Tools
+description: Bing Webmaster Tools search performance analytics, crawl issues, and IndexNow instant indexing for AI agents
+category: analytics
+author: Surendran B
+repository: https://github.com/surendranb/bing-webmaster-mcp-server
+homepage: https://bing-webmaster.builditwithai.xyz
+license: MIT
+runtime:
+  type: uvx
+  package: bing-webmaster-mcp==0.1.3
+  command: uvx
+  args:
+    - bing-webmaster-mcp==0.1.3
+environmentVariables:
+  - name: BING_WEBMASTER_API_KEY
+    description: Bing Webmaster Tools API Key
+    required: false
+  - name: INDEXNOW_KEY
+    description: IndexNow key for instant search engine indexing
+    required: false

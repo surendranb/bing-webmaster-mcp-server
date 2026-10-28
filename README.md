@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.surendranb/bing-webmaster-mcp -->
 # Bing Webmaster Tools & IndexNow MCP Server
 
 High-signal Model Context Protocol (MCP) server for Microsoft Bing Webmaster Tools and IndexNow instant search engine indexing.
