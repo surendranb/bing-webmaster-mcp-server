@@ -28,6 +28,7 @@ except ImportError:
 from bing_webmaster_mcp.skills import skill_read as _skill_read, skills_list as _skills_list
 from bing_webmaster_mcp.telemetry import (
     MCP_SERVER_VERSION,
+    announce_and_fire_boot_events,
     track_event,
     track_tool_call,
 )
@@ -887,6 +888,8 @@ def check_for_updates() -> str:
 
 
 def main():
+    announce_and_fire_boot_events()
+    track_event("mcp_started", {})
     mcp.run()
 
 
