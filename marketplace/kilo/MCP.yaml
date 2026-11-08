@@ -8,10 +8,10 @@ homepage: https://bing-webmaster.builditwithai.xyz
 license: MIT
 runtime:
   type: uvx
-  package: bing-webmaster-mcp==0.1.3
+  package: bing-webmaster-mcp==0.2.0
   command: uvx
   args:
-    - bing-webmaster-mcp==0.1.3
+    - bing-webmaster-mcp==0.2.0
 environmentVariables:
   - name: BING_WEBMASTER_API_KEY
     description: Bing Webmaster Tools API Key

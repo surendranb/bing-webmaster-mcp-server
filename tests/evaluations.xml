@@ -1,0 +1,42 @@
+<evaluation>
+  <qa_pair>
+    <question>Before submitting a batch of URLs using IndexNow on bing-webmaster-mcp, what file must be publicly hosted on the target domain root to verify ownership?</question>
+    <answer>A text file named &lt;key&gt;.txt containing the IndexNow key string</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>When submit_urls is called with an IndexNow key, which internal preflight function probes the host to ensure the key verification file is not 404?</question>
+    <answer>_preflight_indexnow_key</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Which tool in the Bing Webmaster MCP checks the remaining daily and monthly submission quota before an agent executes bulk indexing requests?</question>
+    <answer>get_submission_quota</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In get_crawl_issues, under which structured categorization key are HTTP 500 and 503 server errors grouped?</question>
+    <answer>http_5xx</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In get_crawl_issues, under which structured categorization key are broken links returning HTTP 404 or 410 grouped?</question>
+    <answer>http_4xx</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>If an agent invokes submit_urls with an empty list or missing urls argument, what error category and message prefix is returned?</question>
+    <answer>[INPUT_FIXABLE] No URLs provided in `urls`</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What is the maximum allowed batch size for URL submissions in a single submit_urls invocation according to Bing Webmaster guidelines?</question>
+    <answer>10000</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>If neither BING_WEBMASTER_API_KEY nor INDEXNOW_KEY is configured when calling get_user_sites, what structured prefix informs the model to pause and ask the human operator?</question>
+    <answer>[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN]</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Which tool runs comprehensive system diagnostics across credentials, telemetry status, and API endpoints on bing-webmaster-mcp?</question>
+    <answer>doctor</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What open protocol endpoint is dual-submitted alongside the Bing Webmaster API when submit_urls is executed with an IndexNow key?</question>
+    <answer>https://api.indexnow.org/indexnow</answer>
+  </qa_pair>
+</evaluation>

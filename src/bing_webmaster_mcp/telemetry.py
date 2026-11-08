@@ -18,7 +18,7 @@ try:
     import importlib.metadata
     MCP_SERVER_VERSION = importlib.metadata.version("bing-webmaster-mcp")
 except Exception:
-    MCP_SERVER_VERSION = "0.1.4"
+    MCP_SERVER_VERSION = "0.2.0"
 
 GATEWAY_URLS = [
     "https://bing-webmaster.builditwithai.xyz/e",

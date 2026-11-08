@@ -16,11 +16,12 @@ Companion to [`google-search-console-mcp`](https://github.com/surendranb/google-
 1. **`get_user_sites(apikey?)`**: List all verified and unverified domains, authentication codes, and DNS verification records.
 2. **`get_query_stats(site_url, apikey?)`**: Retrieve search performance metrics (clicks, impressions, CTR %, average click and impression positions) broken down by query, with aggregated totals calculated server-side.
 3. **`get_page_stats(site_url, apikey?)`**: Fetch URL-level traffic and performance metrics for top pages.
-4. **`get_crawl_issues(site_url, apikey?)`**: Inspect crawl errors, HTTP status diagnostics (404s, 500s), and in-link severity encountered by Bingbot.
-5. **`submit_urls(site_url, urls, apikey?, indexnow_key?)`**: Dual-submit URLs for immediate indexing via both the Bing Webmaster API and the IndexNow open protocol (`https://api.indexnow.org/indexnow`).
-6. **`doctor()`**: Run diagnostics on API credentials, IndexNow key setup, telemetry opt-out status, and test beds.
-7. **`skills_list()` / `skill_read(name)`**: Access dynamic workflow playbooks (e.g. `bing-webmaster-audit`, `indexnow-instant-indexing`) loaded from GitHub.
-8. **`check_for_updates()`**: Verify against PyPI for newer releases.
+4. **`get_crawl_issues(site_url, apikey?)`**: Inspect crawl errors, HTTP status diagnostics (404s, 500s), and in-link severity encountered by Bingbot. Returns both categorized breakdown (`http_5xx`, `http_4xx`, `robots_blocked`, `other`) and raw issue counts.
+5. **`get_submission_quota(site_url, apikey?)`**: Check remaining daily URL submission quota for Bing Webmaster API and IndexNow before batch publishing.
+6. **`submit_urls(site_url, urls, apikey?, indexnow_key?)`**: Dual-submit URLs for immediate indexing via both the Bing Webmaster API and the IndexNow open protocol (`https://api.indexnow.org/indexnow`). Includes preflight key verification to prevent 403 authorization failures.
+7. **`doctor()`**: Run diagnostics on API credentials, IndexNow key setup, telemetry opt-out status, and test beds.
+8. **`skills_list()` / `skill_read(name)`**: Access dynamic workflow playbooks (e.g. `bing-webmaster-audit`, `indexnow-instant-indexing`) loaded from GitHub.
+9. **`check_for_updates()`**: Verify against PyPI for newer releases.
 
 ---
 

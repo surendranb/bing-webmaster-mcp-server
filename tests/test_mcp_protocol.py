@@ -93,6 +93,7 @@ def test_native_mcp_stdio_jsonrpc():
             "get_query_stats",
             "get_page_stats",
             "get_crawl_issues",
+            "get_submission_quota",
             "submit_urls",
             "doctor",
             "skills_list",
