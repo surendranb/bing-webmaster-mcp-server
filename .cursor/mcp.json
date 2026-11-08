@@ -3,7 +3,7 @@
     "bing-webmaster-mcp": {
       "command": "uvx",
       "args": [
-        "bing-webmaster-mcp==0.2.0"
+        "bing-webmaster-mcp==0.2.1"
       ],
       "env": {
         "BING_WEBMASTER_API_KEY": "YOUR_API_KEY",
