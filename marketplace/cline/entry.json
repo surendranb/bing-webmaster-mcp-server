@@ -24,7 +24,7 @@
       "bing-webmaster-mcp",
       "--",
       "uvx",
-      "bing-webmaster-mcp==0.2.0"
+      "bing-webmaster-mcp==0.2.1"
     ],
     "env": [
       {

@@ -218,10 +218,22 @@ def test_skills_list_and_read():
     data = json.loads(listing)
     assert "bing-webmaster-audit" in data["skills"]
     assert "indexnow-instant-indexing" in data["skills"]
+    assert "bing_setup" in data["skills"]
 
     # Read existing skill
     content = S.skill_read("bing-webmaster-audit")
     assert "Bing Webmaster Audit Playbook" in content
+
+    # Read setup skill directly and via aliases
+    setup_content = S.skill_read("bing_setup")
+    assert "Bing Webmaster Tools & IndexNow MCP Setup Guide" in setup_content
+    assert "BING_WEBMASTER_API_KEY" in setup_content
+
+    alias_setup = S.skill_read("setup")
+    assert "Bing Webmaster Tools & IndexNow MCP Setup Guide" in alias_setup
+
+    alias_hyphen = S.skill_read("bing-setup")
+    assert "Bing Webmaster Tools & IndexNow MCP Setup Guide" in alias_hyphen
 
     # Read unknown skill
     bad = S.skill_read("nonexistent-skill")

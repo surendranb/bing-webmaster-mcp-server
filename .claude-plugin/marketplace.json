@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Bing Webmaster Tools and IndexNow API MCP server for AI agents: search performance, crawl issues, and instant URL indexing.",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
   "plugins": [
     {

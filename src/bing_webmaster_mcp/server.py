@@ -265,7 +265,8 @@ def _format_missing_key_error() -> str:
         "1. Sign in to Bing Webmaster Tools: https://www.bing.com/webmasters\n"
         "2. Click the Settings icon (gear in top right) -> API Access -> API Key.\n"
         "3. Click 'Generate API Key' (or copy your existing key).\n"
-        "4. Provide it via the `apikey` parameter in tool calls, or export it in your environment: `export BING_WEBMASTER_API_KEY=\"<your_key>\"`."
+        "4. Provide it via the `apikey` parameter in tool calls, or export it in your environment: `export BING_WEBMASTER_API_KEY=\"<your_key>\"`.\n"
+        "Tip: Call skill_read('bing_setup') for step-by-step setup and client configuration."
     )
 
 
@@ -281,7 +282,7 @@ def _format_http_error(err: urllib.error.HTTPError, site_url: Optional[str] = No
         return (
             f"[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] Bing Webmaster API authentication failed (HTTP {code} {reason}).\n"
             "Your API key is invalid or unauthorized. Please verify the key at https://www.bing.com/webmasters "
-            "(Settings -> API Access -> API Key)."
+            "(Settings -> API Access -> API Key) — or call skill_read('bing_setup') for complete troubleshooting instructions."
         )
     elif code == 400:
         if site_url and "not found" in body.lower():
