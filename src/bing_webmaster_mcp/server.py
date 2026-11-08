@@ -226,6 +226,38 @@ def _resolve_indexnow_key(indexnow_key: Optional[str] = None, apikey: Optional[s
     return None
 
 
+def _preflight_indexnow_key(site_url: str, key: str, timeout: float = 3.0) -> tuple[bool, str]:
+    """Verify that the IndexNow key file is hosted at https://<host>/<key>.txt and contains the key."""
+    parsed = urllib.parse.urlparse(site_url)
+    scheme = parsed.scheme or "https"
+    host = parsed.netloc or parsed.path.split("/")[0]
+    key_url = f"{scheme}://{host}/{key}.txt"
+
+    req = urllib.request.Request(
+        key_url,
+        headers={"User-Agent": f"bing-webmaster-mcp-preflight/{MCP_SERVER_VERSION}"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            content = resp.read().decode("utf-8", errors="replace").strip()
+            if key in content:
+                return True, f"Key verified at {key_url}"
+            return False, (
+                f"[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] IndexNow key verification file missing at {key_url}. "
+                f"File returned '{content[:50]}', which does not match key '{key}'."
+            )
+    except urllib.error.HTTPError as e:
+        return False, (
+            f"[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] IndexNow key verification file missing (HTTP {e.code}). "
+            f"Please host a text file named '{key}.txt' containing only '{key}' at root: {key_url}."
+        )
+    except Exception as e:
+        return False, (
+            f"[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] Could not reach IndexNow key file at {key_url} ({e}). "
+            f"Verify the file is publicly accessible."
+        )
+
+
 def _format_missing_key_error() -> str:
     return (
         "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] Missing Bing Webmaster API key.\n\n"
@@ -553,21 +585,41 @@ def get_crawl_issues(site_url: str, apikey: Optional[str] = None) -> str:
         raw_issues = data.get("d", []) if isinstance(data, dict) else []
         issues = []
         code_counts: dict[str, int] = {}
+        cat_5xx = []
+        cat_4xx = []
+        cat_robots = []
+        cat_other = []
         for r in raw_issues:
             code = str(r.get("HttpCode", "Unknown"))
             code_counts[code] = code_counts.get(code, 0) + 1
-            issues.append({
+            iss_entry = {
                 "url": r.get("Url"),
                 "http_code": code,
                 "issue_type": r.get("Issues", ""),
                 "in_links": int(r.get("InLinks", 0)) if r.get("InLinks") is not None else 0,
-            })
+            }
+            issues.append(iss_entry)
+            desc = str(r.get("Description", "")).lower() + " " + str(r.get("Issues", "")).lower()
+            if code.startswith("5"):
+                cat_5xx.append(iss_entry)
+            elif code.startswith("4"):
+                cat_4xx.append(iss_entry)
+            elif "robot" in desc or "block" in desc:
+                cat_robots.append(iss_entry)
+            else:
+                cat_other.append(iss_entry)
 
         result = {
             "site_url": clean_site,
             "summary": {
                 "total_issues": len(issues),
                 "by_http_code": code_counts,
+            },
+            "categorized": {
+                "http_5xx": {"count": len(cat_5xx), "sample": cat_5xx[:10]},
+                "http_4xx": {"count": len(cat_4xx), "sample": cat_4xx[:10]},
+                "robots_blocked": {"count": len(cat_robots), "sample": cat_robots[:10]},
+                "other": {"count": len(cat_other), "sample": cat_other[:10]}
             },
             "issues": issues,
         }
@@ -585,6 +637,56 @@ def get_crawl_issues(site_url: str, apikey: Optional[str] = None) -> str:
     except Exception as e:
         err = f"[TRANSIENT] Error executing get_crawl_issues ({type(e).__name__}: {str(e)}). Please retry."
         track_tool_call("get_crawl_issues", (time.perf_counter() - t0) * 1000, "error", 0, len(err), cat=type(e).__name__, error_message=err)
+        return err
+
+
+@mcp.tool()
+def get_submission_quota(site_url: str, apikey: Optional[str] = None) -> str:
+    """Retrieve daily and monthly URL submission quota for a verified site on Bing Webmaster Tools.
+    
+    Args:
+        site_url: The verified site URL (e.g. 'https://example.com')
+        apikey: Bing Webmaster API Key (optional if BING_WEBMASTER_API_KEY env is set)
+        
+    Returns:
+        JSON string containing daily and monthly remaining quota.
+    """
+    t0 = time.perf_counter()
+    url_err = _validate_site_url(site_url)
+    if url_err:
+        track_tool_call("get_submission_quota", (time.perf_counter() - t0) * 1000, "error", 0, len(url_err), cat="ValidationError", error_message=url_err)
+        return url_err
+
+    key = _resolve_bing_api_key(apikey)
+    if not key:
+        err = _format_missing_key_error()
+        track_tool_call("get_submission_quota", (time.perf_counter() - t0) * 1000, "error", 0, len(err), cat="AuthError", error_message=err)
+        return err
+
+    clean_site = site_url.strip()
+    api_url = f"{BING_API_BASE}/GetUrlSubmissionQuota?siteUrl={urllib.parse.quote(clean_site)}&apikey={urllib.parse.quote(key)}"
+    try:
+        data = _http_get_json(api_url)
+        d = data.get("d", {}) if isinstance(data, dict) else {}
+        daily = int(d.get("DailyQuota", 0))
+        monthly = int(d.get("MonthlyQuota", 0))
+
+        result = {
+            "site_url": clean_site,
+            "daily_quota": daily,
+            "monthly_quota": monthly,
+            "guidance": f"Daily submission quota remaining: {daily}. Batch size limit is 10,000 URLs per submit_urls call."
+        }
+        out = json.dumps(result, indent=2)
+        track_tool_call("get_submission_quota", (time.perf_counter() - t0) * 1000, "success", 1, len(out))
+        return out
+    except urllib.error.HTTPError as e:
+        err = _format_http_error(e, clean_site)
+        track_tool_call("get_submission_quota", (time.perf_counter() - t0) * 1000, "error", 0, len(err), cat="HTTPError", error_message=err)
+        return err
+    except Exception as e:
+        err = f"[TRANSIENT] Error executing get_submission_quota ({type(e).__name__}: {str(e)}). Please retry."
+        track_tool_call("get_submission_quota", (time.perf_counter() - t0) * 1000, "error", 0, len(err), cat=type(e).__name__, error_message=err)
         return err
 
 
@@ -655,6 +757,13 @@ def submit_urls(
         )
         track_tool_call("submit_urls", (time.perf_counter() - t0) * 1000, "error", 0, len(err), cat="AuthError", error_message=err)
         return err
+
+    # Preflight IndexNow key check if IndexNow is used
+    if idx_key and not bing_key:
+        pf_ok, pf_msg = _preflight_indexnow_key(clean_site, idx_key)
+        if not pf_ok:
+            track_tool_call("submit_urls", (time.perf_counter() - t0) * 1000, "error", 0, len(pf_msg), cat="IndexNowPreflightError", error_message=pf_msg)
+            return pf_msg
 
     submission_results: dict[str, Any] = {
         "site_url": clean_site,
