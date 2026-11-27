@@ -270,6 +270,69 @@ def _format_missing_key_error() -> str:
     )
 
 
+# Bing Webmaster ApiErrorCode enum values that need different remediation than HTTP status alone.
+# https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.apierrorcode
+_BING_ERROR_CODES: dict[int, str] = {
+    3: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] Bing Webmaster API rejected the API key "
+        "(ErrorCode 3 InvalidApiKey). The key is invalid, expired, or lacks permission for this account.\n"
+        "Generate or copy a valid key at https://www.bing.com/webmasters (Settings -> API Access -> API Key), "
+        "then pass it as `apikey` or set BING_WEBMASTER_API_KEY. Call skill_read('bing_setup') for setup steps."
+    ),
+    4: "[TRANSIENT] Bing Webmaster API per-user throttle reached (ErrorCode 4 ThrottleUser). Wait a minute and retry.",
+    5: "[TRANSIENT] Bing Webmaster API per-host throttle reached (ErrorCode 5 ThrottleHost). Wait a minute and retry.",
+    6: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] This Bing Webmaster account is blocked "
+        "(ErrorCode 6 UserBlocked). Sign in at https://www.bing.com/webmasters and resolve the account block."
+    ),
+    7: (
+        "[INPUT_FIXABLE] Bing Webmaster API rejected the URL (ErrorCode 7 InvalidUrl). "
+        "Pass an absolute URL including protocol, e.g. 'https://example.com/page'."
+    ),
+    8: "[INPUT_FIXABLE] Bing Webmaster API rejected a parameter value (ErrorCode 8 InvalidParameter).",
+    9: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] This Bing Webmaster account has too many sites "
+        "(ErrorCode 9 TooManySites). Remove an unverified property at https://www.bing.com/webmasters."
+    ),
+    10: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] The API key does not resolve to a Bing Webmaster user "
+        "(ErrorCode 10 UserNotFound). Generate the key at https://www.bing.com/webmasters "
+        "(Settings -> API Access -> API Key) and set BING_WEBMASTER_API_KEY."
+    ),
+    11: (
+        "[INPUT_FIXABLE] The requested property is not registered in this Bing Webmaster account "
+        "(ErrorCode 11 NotFound). Call get_user_sites to list verified properties, or add and verify the site "
+        "at https://www.bing.com/webmasters."
+    ),
+    13: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] This operation is not allowed for the account or property "
+        "(ErrorCode 13 NotAllowed)."
+    ),
+    14: (
+        "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] The API key is not authorized for this property "
+        "(ErrorCode 14 NotAuthorized). Use a key from the account that owns the verified property: "
+        "https://www.bing.com/webmasters (Settings -> API Access -> API Key)."
+    ),
+    16: "[ENVIRONMENT_FIXABLE: STOP & ASK HUMAN] This Bing Webmaster API endpoint is deprecated (ErrorCode 16 Deprecated).",
+}
+
+
+def _bing_error_code(body: str) -> Optional[int]:
+    try:
+        parsed = json.loads(body)
+    except Exception:
+        return None
+    if not isinstance(parsed, dict):
+        return None
+    for key, value in parsed.items():
+        if str(key).lower() == "errorcode":
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
 def _format_http_error(err: urllib.error.HTTPError, site_url: Optional[str] = None) -> str:
     code = err.code
     reason = err.reason
@@ -277,6 +340,10 @@ def _format_http_error(err: urllib.error.HTTPError, site_url: Optional[str] = No
         body = err.read().decode("utf-8", "replace")
     except Exception:
         body = ""
+
+    bing_code = _bing_error_code(body)
+    if bing_code in _BING_ERROR_CODES:
+        return _BING_ERROR_CODES[bing_code]
 
     if code in (401, 403):
         return (
