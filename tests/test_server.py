@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 """Unit tests for bing-webmaster-mcp server tools and deterministic test beds."""
+import io
 import json
 import urllib.error
 from unittest.mock import MagicMock, patch
@@ -239,3 +240,43 @@ def test_skills_list_and_read():
     bad = S.skill_read("nonexistent-skill")
     assert "[INPUT_FIXABLE]" in bad
     assert "Available skills" in bad
+
+
+# ---------------------------------------------------------------------------
+# Bing ErrorCode -> remediation text (shared _format_http_error)
+# ---------------------------------------------------------------------------
+def _http_error(status: int, body: dict | str) -> urllib.error.HTTPError:
+    raw = json.dumps(body) if isinstance(body, dict) else body
+    return urllib.error.HTTPError(
+        "https://ssl.bing.com/webmaster/api.svc/json/GetQueryStats",
+        status,
+        "Bad Request",
+        {},
+        io.BytesIO(raw.encode("utf-8")),
+    )
+
+
+def test_errorcode_3_names_api_key_and_never_the_site_url():
+    msg = S._format_http_error(_http_error(400, {"ErrorCode": 3, "Message": "InvalidApiKey"}), "https://surendranb.com")
+    assert "api key" in msg.lower()
+    assert "https://www.bing.com/webmasters" in msg
+    assert "site" not in msg.lower()
+    assert "surendranb.com" not in msg
+
+
+def test_errorcode_14_names_api_key_permission():
+    msg = S._format_http_error(_http_error(400, {"ErrorCode": 14, "Message": "NotAuthorized"}), "https://surendranb.com")
+    assert "not authorized" in msg.lower()
+    assert "api key" in msg.lower()
+
+
+def test_errorcode_11_points_at_unregistered_property():
+    msg = S._format_http_error(_http_error(400, {"ErrorCode": 11, "Message": "NotFound"}), "https://surendranb.com")
+    assert "get_user_sites" in msg
+    assert "not registered" in msg
+
+
+def test_plain_400_without_errorcode_keeps_parameter_guidance():
+    msg = S._format_http_error(_http_error(400, "malformed request"), "https://surendranb.com")
+    assert "[INPUT_FIXABLE]" in msg
+    assert "parameter" in msg.lower()
